@@ -341,7 +341,13 @@ function resetPB(){
 function normProd(p){
   const catR=(p.categories_tags||[]).find(c=>c.startsWith('en:'))||'';
   const cat=catR.replace('en:','').replace(/-/g,' ').replace(/\b\w/g,l=>l.toUpperCase());
-  const brand=((p.brands||'').split(',')[0]||'').trim();
+  const br=p.brands;
+  let brandLine='';
+  if(Array.isArray(br)) brandLine=String(br[0]??'');
+  else if(typeof br==='string') brandLine=br;
+  else if(br!=null&&typeof br==='object') brandLine=String(br.name??br.main??'');
+  else brandLine=String(br??'');
+  const brand=brandLine.split(',')[0].trim();
   const stores=(p.stores_tags||[]).slice(0,3).map(s=>s.replace(/^en:/,'').replace(/-/g,' ').replace(/\b\w/g,l=>l.toUpperCase())).filter(Boolean).join(', ');
   const themes=(p.labels_tags||[]).map(l=>LMAP[l]).filter(Boolean);
   if(!themes.length&&cat)themes.push('#'+cat.replace(/\s+/g,'').toLowerCase().substring(0,20));
