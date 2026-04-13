@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>North Star — Open Food Facts Worksheet</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --g:#3B6D11;--gl:#EAF3DE;--gb:#C0DD97;--gd:#27500A;
+  --bl:#E6F1FB;--bd:#0C447C;--al:#FAEEDA;--ad:#633806;
+  --tp:#1a1a18;--ts:#555550;--tt:#888880;
+  --bp:#fff;--bs:#f7f7f5;--bt:#f0efeb;
+  --br:rgba(0,0,0,0.11);--brm:rgba(0,0,0,0.2);
+  --r:8px;--rl:12px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bt);color:var(--tp);font-size:14px;}
+.nav{background:var(--bp);border-bottom:0.5px solid var(--br);padding:0 1.5rem;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;}
+.nav-l{display:flex;align-items:center;gap:10px;font-size:13px;}
+.nav-logo{display:flex;align-items:center;gap:7px;font-weight:500;font-size:14px;}
+.nav-r{display:flex;gap:8px;}
+.nbtn{font-size:12px;padding:5px 14px;border:0.5px solid var(--br);border-radius:var(--r);background:none;color:var(--ts);cursor:pointer;font-family:inherit;}
+.nbtn.p{background:var(--g);color:#EAF3DE;border-color:var(--g);}
+.nbtn.p:hover{background:var(--gd);}
+.shell{max-width:1120px;margin:0 auto;padding:1.5rem 1.5rem 4rem;}
+.ws-card{background:var(--bp);border:0.5px solid var(--br);border-radius:var(--rl);overflow:hidden;margin-bottom:.75rem;}
+.ws-table{width:100%;border-collapse:collapse;table-layout:fixed;}
+.ws-table col.c1{width:220px;}.ws-table col.c2{width:145px;}.ws-table col.c3{width:170px;}.ws-table col.c4{width:170px;}.ws-table col.c5{width:auto;}.ws-table col.c6{width:44px;}
+.ws-table th{font-size:11px;font-weight:500;color:var(--tt);letter-spacing:.07em;text-transform:uppercase;padding:9px 12px;text-align:left;border-bottom:0.5px solid var(--br);border-right:0.5px solid var(--br);background:var(--bs);}
+.ws-table th:last-child{border-right:none;text-align:center;}
+.ws-table td{padding:8px 10px;border-bottom:0.5px solid var(--br);border-right:0.5px solid var(--br);vertical-align:middle;height:56px;}
+.ws-table td:last-child{border-right:none;text-align:center;}
+.ws-table tr:last-child td{border-bottom:none;}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--bs);border:0.5px solid var(--br);border-radius:var(--r);padding:4px 8px;font-size:12px;color:var(--tp);max-width:150px;}
+.chip img{width:22px;height:22px;border-radius:4px;object-fit:cover;flex-shrink:0;background:var(--bs);}
+.chip-n{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.badge{display:inline-block;font-size:10px;padding:2px 6px;border-radius:10px;font-weight:500;margin-left:3px;}
+.b-p{background:var(--gl);color:var(--g);}.b-o{background:var(--bl);color:var(--bd);}.b-c{background:var(--al);color:var(--ad);}
+.abtn{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--tt);padding:3px 8px;border-radius:var(--r);border:0.5px dashed var(--br);background:none;cursor:pointer;font-family:inherit;}
+.abtn:hover{color:var(--ts);border-color:var(--brm);}
+.tpill{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;background:var(--gl);color:var(--g);border:0.5px solid var(--gb);margin:2px 2px 2px 0;}
+.themes-td{display:flex;flex-wrap:wrap;align-items:center;gap:3px;}
+.lbtn{width:30px;height:30px;border:0.5px solid var(--br);border-radius:var(--r);background:var(--bp);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:var(--ts);}
+.lbtn:hover,.lbtn.on{border-color:var(--g);color:var(--g);background:var(--gl);}
+.lbtn svg{width:15px;height:15px;}
+.clickable{cursor:pointer;}.clickable:hover .chip{border-color:var(--g);}
+.panel{background:var(--bp);border:0.5px solid var(--br);border-radius:var(--rl);overflow:hidden;margin-top:.75rem;display:none;}
+.ph{padding:12px 16px;border-bottom:0.5px solid var(--br);display:flex;align-items:center;justify-content:space-between;}
+.ph-title{font-size:13px;font-weight:500;}.ph-sub{font-size:11px;color:var(--tt);margin-top:2px;}
+.off-b{font-size:10px;padding:3px 9px;border-radius:20px;background:var(--bl);color:var(--bd);font-weight:500;}
+.sbar{padding:10px 14px;border-bottom:0.5px solid var(--br);display:flex;gap:8px;align-items:center;}
+.mtog{display:flex;border:0.5px solid var(--br);border-radius:var(--r);overflow:hidden;flex-shrink:0;}
+.mbtn{font-size:12px;padding:0 12px;height:34px;border:none;background:none;cursor:pointer;font-family:inherit;color:var(--ts);}
+.mbtn.on{background:var(--g);color:#EAF3DE;}
+.si{flex:1;height:34px;padding:0 10px;border:0.5px solid var(--br);border-radius:var(--r);font-size:13px;font-family:inherit;color:var(--tp);background:var(--bp);outline:none;}
+.si:focus{border-color:var(--g);}
+.sgo{height:34px;padding:0 16px;background:var(--g);color:#EAF3DE;border:none;border-radius:var(--r);font-size:13px;font-family:inherit;font-weight:500;cursor:pointer;}
+.sgo:hover{background:var(--gd);}
+.pbody{padding:14px 16px;}
+.idle-s{text-align:center;padding:2.5rem 1rem;color:var(--tt);font-size:13px;line-height:1.7;}
+.idle-s svg{display:block;margin:0 auto 10px;opacity:.3;}
+.spin-w{text-align:center;padding:2.5rem;}
+.spinner{width:22px;height:22px;margin:0 auto 12px;border:2px solid var(--br);border-top-color:var(--g);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.spin-l{font-size:13px;color:var(--ts);}
+.errmsg{padding:12px 14px;background:#FCEBEB;border-radius:var(--r);font-size:13px;color:#A32D2D;line-height:1.6;}
+.rh{font-size:12px;color:var(--ts);margin-bottom:10px;}
+.rlist{display:flex;flex-direction:column;gap:7px;margin-bottom:12px;}
+.rcard{display:flex;align-items:center;gap:10px;padding:10px 12px;border:0.5px solid var(--br);border-radius:var(--r);cursor:pointer;background:var(--bp);transition:all .15s;}
+.rcard:hover{border-color:var(--gb);background:var(--gl);}
+.rcard.sel{border:1.5px solid var(--g);background:var(--gl);}
+.rcard img{width:40px;height:40px;border-radius:var(--r);object-fit:cover;flex-shrink:0;background:var(--bs);border:0.5px solid var(--br);}
+.rcard-i{flex:1;min-width:0;}
+.rcard-n{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.rcard-m{font-size:11px;color:var(--ts);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.radio{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--brm);flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.rcard.sel .radio{background:var(--g);border-color:var(--g);}
+.rcard.sel .radio::after{content:'';width:6px;height:6px;border-radius:50%;background:#fff;}
+.ubtn{width:100%;height:36px;background:var(--g);color:#EAF3DE;border:none;border-radius:var(--r);font-size:13px;font-family:inherit;font-weight:500;cursor:pointer;}
+.ubtn:hover{background:var(--gd);}
+.ubtn:disabled{opacity:.4;cursor:not-allowed;}
+.pd-hd{display:flex;align-items:flex-start;gap:14px;margin-bottom:16px;padding-bottom:14px;border-bottom:0.5px solid var(--br);}
+.pd-img{width:72px;height:72px;border-radius:var(--r);object-fit:cover;border:0.5px solid var(--br);flex-shrink:0;background:var(--bs);}
+.pd-title{font-size:15px;font-weight:500;margin-bottom:3px;}
+.pd-brand{font-size:12px;color:var(--ts);margin-bottom:5px;}
+.pd-bc{font-size:11px;color:var(--tt);font-family:monospace;}
+.sec-l{font-size:11px;font-weight:500;color:var(--tt);letter-spacing:.07em;text-transform:uppercase;margin-bottom:10px;}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.ef{border:0.5px solid var(--br);border-radius:var(--r);padding:9px 11px;background:var(--bs);}
+.ef:focus-within{border-color:var(--g);background:var(--bp);}
+.ef.acc{border-color:var(--g);background:var(--gl);}
+.ef.skp{opacity:.4;}
+.ef-t{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
+.ef-col{font-size:10px;color:var(--tt);text-transform:uppercase;letter-spacing:.07em;}
+.ef-cf{font-size:10px;padding:1px 6px;border-radius:10px;font-weight:500;}
+.ch{background:var(--gl);color:var(--g);}.cm{background:var(--al);color:var(--ad);}
+.ef-inp{width:100%;font-size:12px;font-family:inherit;color:var(--tp);background:transparent;border:none;outline:none;margin-bottom:7px;padding:0;}
+.ef-inp::placeholder{color:var(--tt);}
+.ef-btns{display:flex;gap:5px;}
+.efa{font-size:11px;padding:3px 9px;border-radius:5px;background:var(--g);color:#EAF3DE;border:none;cursor:pointer;font-family:inherit;}
+.efa:hover{background:var(--gd);}
+.efs{font-size:11px;padding:3px 9px;border-radius:5px;background:none;border:0.5px solid var(--br);color:var(--ts);cursor:pointer;font-family:inherit;}
+.ef-done{font-size:11px;color:var(--g);font-weight:500;}
+.ef-sk{font-size:11px;color:var(--tt);}
+.ing{background:var(--bs);border-radius:var(--r);padding:10px 12px;margin-bottom:14px;border:0.5px solid var(--br);}
+.ing-l{font-size:10px;color:var(--tt);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px;}
+.ing-t{font-size:12px;color:var(--ts);line-height:1.6;}
+.ing-more{font-size:11px;color:var(--g);cursor:pointer;margin-top:4px;display:inline-block;background:none;border:none;font-family:inherit;}
+.divl{height:.5px;background:var(--br);margin:14px 0;}
+.tr-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;}
+.tc{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;border:0.5px solid var(--br);background:var(--bp);font-size:12px;color:var(--ts);cursor:pointer;font-family:inherit;transition:all .15s;}
+.tc.on{background:var(--gl);color:var(--g);border-color:var(--gb);}
+.tdot{width:7px;height:7px;border-radius:50%;border:1.5px solid currentColor;flex-shrink:0;}
+.tc.on .tdot{background:var(--g);border-color:var(--g);}
+.src-n{font-size:11px;color:var(--tt);padding:8px 10px;background:var(--bs);border-left:2px solid var(--g);margin-bottom:14px;line-height:1.6;}
+.act{display:flex;gap:8px;}
+.bbk{padding:0 14px;height:36px;border:0.5px solid var(--br);border-radius:var(--r);font-size:13px;font-family:inherit;background:none;color:var(--ts);cursor:pointer;}
+.bbk:hover{border-color:var(--brm);}
+.bap{flex:1;height:36px;background:var(--g);color:#EAF3DE;border:none;border-radius:var(--r);font-size:13px;font-family:inherit;font-weight:500;cursor:pointer;}
+.bap:hover{background:var(--gd);}
+.succ{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;background:var(--gl);border-radius:var(--r);font-size:13px;color:var(--g);margin-bottom:12px;line-height:1.5;}
+.succ svg{flex-shrink:0;margin-top:1px;}
+.nf{text-align:center;padding:2rem 1rem;}
+.nf-t{font-size:14px;font-weight:500;margin-bottom:6px;}
+.nf-s{font-size:12px;color:var(--ts);line-height:1.6;}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.42);z-index:500;align-items:center;justify-content:center;padding:1rem;}
+.overlay.open{display:flex;}
+.modal{background:var(--bp);border-radius:var(--rl);width:100%;max-width:420px;overflow:hidden;}
+.mh{padding:14px 16px;border-bottom:0.5px solid var(--br);display:flex;align-items:center;justify-content:space-between;}
+.mh-t{font-size:14px;font-weight:500;}
+.mx{width:28px;height:28px;border:none;background:none;cursor:pointer;color:var(--ts);font-size:18px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;}
+.mx:hover{background:var(--bs);}
+.mb{padding:14px 16px;}
+.ml{font-size:11px;color:var(--tt);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;}
+.mi{width:100%;height:36px;padding:0 10px;border:0.5px solid var(--br);border-radius:var(--r);font-size:13px;font-family:inherit;color:var(--tp);background:var(--bp);outline:none;}
+.mi:focus{border-color:var(--g);}
+.mf{padding:12px 16px;border-top:0.5px solid var(--br);display:flex;gap:8px;}
+.ms{flex:1;height:36px;background:var(--g);color:#EAF3DE;border:none;border-radius:var(--r);font-size:13px;font-family:inherit;font-weight:500;cursor:pointer;}
+.ms:hover{background:var(--gd);}
+.mc{height:36px;padding:0 14px;border:0.5px solid var(--br);border-radius:var(--r);font-size:13px;font-family:inherit;background:none;color:var(--ts);cursor:pointer;}
+.proxy-note{font-size:11px;color:var(--tt);padding:8px 12px;background:var(--bs);border-radius:var(--r);margin-bottom:.75rem;border:0.5px solid var(--br);}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-l">
+    <div class="nav-logo">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="#3B6D11"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>
+      North Star
+    </div>
+    <span style="color:var(--br);font-size:16px;">/</span>
+    <span style="color:var(--ts);">Products worksheet</span>
+  </div>
+  <div class="nav-r">
+    <button class="nbtn">Save to drafts</button>
+    <button class="nbtn p">Publish all</button>
+  </div>
+</nav>
+
+<div class="shell">
+
+  <div class="proxy-note">
+    API calls use this app's Express routes (<code>/api/off/*</code>), which proxy Open Food Facts on the server (no browser CORS issues).
+    See the dev spec below for route details.
+  </div>
+
+  <div class="ws-card">
+    <table class="ws-table">
+      <colgroup><col class="c1"/><col class="c2"/><col class="c3"/><col class="c4"/><col class="c5"/><col class="c6"/></colgroup>
+      <thead>
+        <tr>
+          <th>Product</th><th>Category</th><th>Made by</th><th>Sold by</th><th>Themes</th>
+          <th style="text-align:center;" title="Look up on Open Food Facts">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+
+  <button onclick="addRow()" style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--tt);background:none;border:none;cursor:pointer;padding:5px 2px;font-family:inherit;margin-bottom:1rem;">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    New row
+  </button>
+
+  <div class="panel" id="panel">
+    <div class="ph">
+      <div><div class="ph-title">Open Food Facts lookup</div><div class="ph-sub" id="ph-sub">Search for a product</div></div>
+      <span class="off-b">openfoodfacts.org</span>
+    </div>
+    <div class="sbar">
+      <div class="mtog">
+        <button class="mbtn on" id="mn" onclick="setMode('name')">Name</button>
+        <button class="mbtn" id="mb2" onclick="setMode('barcode')">Barcode</button>
+      </div>
+      <input class="si" id="si" placeholder="Enter product name..." onkeydown="if(event.key==='Enter')doSearch()"/>
+      <button class="sgo" onclick="doSearch()">Search</button>
+    </div>
+    <div class="pbody" id="pbody">
+      <div class="idle-s">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Search by name or barcode.<br/>You review every field before it goes into your row.
+      </div>
+    </div>
+  </div>
+
+  <!-- DEV SPEC -->
+  <div style="margin-top:2rem;background:var(--bp);border:0.5px solid var(--br);border-radius:var(--rl);overflow:hidden;">
+    <div style="padding:12px 16px;border-bottom:0.5px solid var(--br);background:var(--bs);">
+      <div style="font-size:13px;font-weight:500;">Dev handoff — Express proxy routes</div>
+      <div style="font-size:11px;color:var(--tt);margin-top:2px;">Add these two routes to the North Star Express server. No new dependencies needed — Node has fetch built in (v18+).</div>
+    </div>
+    <div style="padding:14px 16px;">
+      <div style="font-size:11px;color:var(--tt);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;">routes/off.js</div>
+      <pre style="font-size:12px;font-family:monospace;background:var(--bs);padding:14px;border-radius:var(--r);color:var(--tp);white-space:pre-wrap;line-height:1.7;border:0.5px solid var(--br);">const express = require('express');
+const router = express.Router();
+
+const OFF_FIELDS = [
+  'code','product_name','brands','categories_tags',
+  'labels_tags','image_front_url','ingredients_text',
+  'stores_tags','nutrition_grades'
+].join(',');
+
+// GET /api/off/search?q=cheerios
+router.get('/search', async (req, res) => {
+  const { q } = req.query;
+  if (!q) return res.status(400).json({ error: 'q is required' });
+  try {
+    const url = `https://search.openfoodfacts.org/search?` +
+      `q=${encodeURIComponent(q)}&langs=en&page_size=6&fields=${encodeURIComponent(OFF_FIELDS)}`;
+    const r = await fetch(url, {
+      headers: { 'User-Agent': 'NorthStar/1.0 (northstarproject.org)' }
+    });
+    const data = await r.json();
+    res.json(data);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// GET /api/off/barcode/:code
+router.get('/barcode/:code', async (req, res) => {
+  const { code } = req.params;
+  try {
+    const url = `https://world.openfoodfacts.net/api/v2/product/${code}.json` +
+      `?fields=${encodeURIComponent(OFF_FIELDS)}`;
+    const r = await fetch(url, {
+      headers: {
+        'Authorization': 'Basic ' + Buffer.from('off:off').toString('base64'),
+        'User-Agent': 'NorthStar/1.0 (northstarproject.org)'
+      }
+    });
+    const data = await r.json();
+    res.json(data);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+module.exports = router;</pre>
+      <div style="font-size:11px;color:var(--tt);text-transform:uppercase;letter-spacing:.07em;margin:14px 0 8px;">Mount in app.js or server.js</div>
+      <pre style="font-size:12px;font-family:monospace;background:var(--bs);padding:12px;border-radius:var(--r);color:var(--tp);white-space:pre-wrap;line-height:1.7;border:0.5px solid var(--br);">const offRouter = require('./routes/off');
+app.use('/api/off', offRouter);</pre>
+      <div style="font-size:11px;color:var(--tt);text-transform:uppercase;letter-spacing:.07em;margin:14px 0 8px;">React component fetch calls (replaces direct OFF calls)</div>
+      <pre style="font-size:12px;font-family:monospace;background:var(--bs);padding:12px;border-radius:var(--r);color:var(--tp);white-space:pre-wrap;line-height:1.7;border:0.5px solid var(--br);">// Name search
+const res = await fetch(`/api/off/search?q=${encodeURIComponent(query)}`);
+
+// Barcode lookup
+const res = await fetch(`/api/off/barcode/${barcode}`);</pre>
+    </div>
+  </div>
+
+</div>
+
+<div class="overlay" id="ov">
+  <div class="modal">
+    <div class="mh"><div class="mh-t" id="m-title">Edit</div><button class="mx" onclick="closeModal()">✕</button></div>
+    <div class="mb" id="m-body"></div>
+    <div class="mf"><button class="mc" onclick="closeModal()">Cancel</button><button class="ms" onclick="saveModal()">Save</button></div>
+  </div>
+</div>
+
+<script>
+const OFF_SEARCH  = '/api/off/search';
+const OFF_BARCODE = '/api/off/barcode/';
+
+const LMAP = {
+  'en:organic':'#organic','en:fair-trade':'#fairtrade','en:vegan':'#vegan',
+  'en:vegetarian':'#vegetarian','en:gluten-free':'#glutenfree','en:non-gmo':'#nongmo',
+  'en:kosher':'#kosher','en:halal':'#halal','en:no-additives':'#noadditives',
+  'en:no-artificial-colors':'#noartificialcolors','en:bio':'#organic',
+  'en:rainforest-alliance':'#rainforestalliance','en:sustainably-farmed':'#sustainablyfarmed',
+  'en:palm-oil-free':'#palmoilfree','en:no-preservatives':'#nopreservatives',
+};
+
+let rows = [
+  { id:'r1', name:'Skittles', img:'', filled:{ category:'', madeby:'', soldby:'', themes:[], ingredients:'' } },
+  { id:'r2', name:'Das Jam Haus Black Raspberry Jam', img:'', filled:{ category:'Jams & Preserves', madeby:'Das Jam Haus', soldby:'', themes:['#localjam','#smallbatch'], ingredients:'' } }
+];
+let activeRow=null, searchMode='name', selProd=null, fStates={}, selThemes=new Set(), mCtx=null, _prods=[];
+
+function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function renderWS(){
+  const tb = document.getElementById('tbody');
+  tb.innerHTML = '';
+  rows.forEach(row => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>
+        <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;">
+          <div class="chip">
+            ${row.img?`<img src="${esc(row.img)}" onerror="this.style.display='none'"/>`:`<div style="width:22px;height:22px;border-radius:4px;background:var(--gl);flex-shrink:0;"></div>`}
+            <span class="chip-n">${esc(row.name)}</span>
+          </div>
+          <span class="badge b-p">Product</span>
+        </div>
+      </td>
+      <td>${row.filled.category
+        ?`<div class="clickable" style="display:flex;align-items:center;gap:4px;" onclick="openEdit('${row.id}','category','Category')"><div class="chip"><span class="chip-n">${esc(row.filled.category)}</span></div><span class="badge b-c">Cat</span></div>`
+        :`<button class="abtn" onclick="openEdit('${row.id}','category','Category')">+ Add</button>`}
+      </td>
+      <td>${row.filled.madeby
+        ?`<div class="clickable" style="display:flex;align-items:center;gap:4px;" onclick="openEdit('${row.id}','madeby','Made by')"><div class="chip"><span class="chip-n">${esc(row.filled.madeby)}</span></div><span class="badge b-o">Org</span></div>`
+        :`<button class="abtn" onclick="openEdit('${row.id}','madeby','Made by')">+ Add</button>`}
+      </td>
+      <td>${row.filled.soldby
+        ?`<div class="clickable" style="display:flex;align-items:center;gap:4px;" onclick="openEdit('${row.id}','soldby','Sold by')"><div class="chip"><span class="chip-n">${esc(row.filled.soldby)}</span></div><span class="badge b-o">Org</span></div>`
+        :`<button class="abtn" onclick="openEdit('${row.id}','soldby','Sold by')">+ Add</button>`}
+      </td>
+      <td>
+        <div class="themes-td">
+          ${(row.filled.themes||[]).map(t=>`<span class="tpill">${esc(t)}</span>`).join('')}
+          <button class="abtn" onclick="openThemes('${row.id}')">${row.filled.themes.length?'+ Edit':'+ Add'}</button>
+        </div>
+      </td>
+      <td>
+        <button class="lbtn ${activeRow===row.id?'on':''}" onclick="togglePanel('${row.id}')" title="Look up on Open Food Facts">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            <line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/>
+          </svg>
+        </button>
+      </td>`;
+    tb.appendChild(tr);
+  });
+}
+
+function addRow(){
+  const n=prompt('Product name:'); if(!n)return;
+  rows.push({id:'r'+Date.now(),name:n,img:'',filled:{category:'',madeby:'',soldby:'',themes:[],ingredients:''}});
+  renderWS();
+}
+
+function openEdit(rowId,field,label){
+  const row=rows.find(r=>r.id===rowId); mCtx={rowId,field,type:'text'};
+  document.getElementById('m-title').textContent=`Edit ${label}`;
+  document.getElementById('m-body').innerHTML=`<div class="ml">${label}</div><input class="mi" id="mi" value="${esc(row.filled[field]||'')}" placeholder="Enter ${label.toLowerCase()}..."/>`;
+  document.getElementById('ov').classList.add('open');
+  setTimeout(()=>document.getElementById('mi').focus(),50);
+}
+
+function openThemes(rowId){
+  const row=rows.find(r=>r.id===rowId); mCtx={rowId,field:'themes',type:'themes'};
+  document.getElementById('m-title').textContent='Edit themes';
+  document.getElementById('m-body').innerHTML=`<div class="ml">Themes (comma separated)</div><input class="mi" id="mi" value="${esc((row.filled.themes||[]).join(', '))}" placeholder="#organic, #vegan..."/><div style="font-size:11px;color:var(--tt);margin-top:6px;">Each theme should start with #</div>`;
+  document.getElementById('ov').classList.add('open');
+  setTimeout(()=>document.getElementById('mi').focus(),50);
+}
+
+function closeModal(){document.getElementById('ov').classList.remove('open');mCtx=null;}
+
+function saveModal(){
+  if(!mCtx)return; const row=rows.find(r=>r.id===mCtx.rowId); if(!row)return;
+  const val=document.getElementById('mi').value.trim();
+  if(mCtx.type==='themes'){row.filled.themes=val.split(',').map(t=>t.trim()).filter(Boolean).map(t=>t.startsWith('#')?t:'#'+t);}
+  else{row.filled[mCtx.field]=val;}
+  closeModal(); renderWS();
+  if(activeRow)document.getElementById('panel').style.display='block';
+}
+
+function togglePanel(rowId){
+  const p=document.getElementById('panel');
+  if(activeRow===rowId){activeRow=null;p.style.display='none';renderWS();return;}
+  activeRow=rowId;
+  const row=rows.find(r=>r.id===rowId);
+  document.getElementById('ph-sub').textContent=`Enriching: ${row.name}`;
+  document.getElementById('si').value=row.name;
+  p.style.display='block'; renderWS(); resetPB();
+  p.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function setMode(m){
+  searchMode=m;
+  document.getElementById('mn').classList.toggle('on',m==='name');
+  document.getElementById('mb2').classList.toggle('on',m==='barcode');
+  document.getElementById('si').placeholder=m==='name'?'Enter product name...':'Enter barcode (e.g. 737628064502)';
+}
+
+function resetPB(){
+  selProd=null;fStates={};selThemes=new Set();
+  document.getElementById('pbody').innerHTML=`<div class="idle-s"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Search by name or barcode.<br/>You review every field before it goes into your row.</div>`;
+}
+
+function normProd(p){
+  const catR=(p.categories_tags||[]).find(c=>c.startsWith('en:'))||'';
+  const cat=catR.replace('en:','').replace(/-/g,' ').replace(/\b\w/g,l=>l.toUpperCase());
+  const brand=((p.brands||'').split(',')[0]||'').trim();
+  const stores=(p.stores_tags||[]).slice(0,3).map(s=>s.replace(/^en:/,'').replace(/-/g,' ').replace(/\b\w/g,l=>l.toUpperCase())).filter(Boolean).join(', ');
+  const themes=(p.labels_tags||[]).map(l=>LMAP[l]).filter(Boolean);
+  if(!themes.length&&cat)themes.push('#'+cat.replace(/\s+/g,'').toLowerCase().substring(0,20));
+  return{name:p.product_name||'',brand,category:cat,madeby:brand,soldby:stores,
+    ingredients:p.ingredients_text||'',image:p.image_front_url||'',
+    themes,barcode:p.code||p._id||'',nutriscore:p.nutrition_grades||''};
+}
+
+async function doSearch(){
+  const q=document.getElementById('si').value.trim(); if(!q)return;
+  document.getElementById('pbody').innerHTML=`<div class="spin-w"><div class="spinner"></div><div class="spin-l">Searching Open Food Facts...</div></div>`;
+  try{
+    let hits=[];
+    if(searchMode==='barcode'){
+      const r=await fetch(`${OFF_BARCODE}${encodeURIComponent(q)}`);
+      const d=await r.json();
+      if(d.status===1&&d.product){showPF(normProd(d.product));return;}
+      else{showNF(q);return;}
+    } else {
+      const r=await fetch(`${OFF_SEARCH}?q=${encodeURIComponent(q)}`);
+      if(!r.ok)throw new Error(`HTTP ${r.status}`);
+      const d=await r.json();
+      // search-a-licious returns hits array with _source objects
+      if(d.hits&&Array.isArray(d.hits)){
+        hits=d.hits.map(h=>h._source||h).filter(p=>p.product_name);
+      } else if(d.products&&Array.isArray(d.products)){
+        hits=d.products.filter(p=>p.product_name);
+      }
+    }
+    if(!hits.length){showNF(q);}
+    else{showResults(hits.slice(0,5).map(normProd));}
+  }catch(e){
+    console.error(e);
+    document.getElementById('pbody').innerHTML=`<div class="errmsg"><strong>Search failed.</strong><br/>${esc(e.message)}<br/><br/>The demo proxy may be temporarily unavailable. The Express routes in the dev spec below eliminate this dependency entirely.</div>`;
+  }
+}
+
+function showResults(prods){
+  _prods=prods;
+  let h=`<div class="rh">${prods.length} result${prods.length!==1?'s':''} found — select one to continue</div><div class="rlist">`;
+  prods.forEach((p,i)=>{
+    h+=`<div class="rcard" id="rc${i}" onclick="pickR(${i})">
+      <img src="${esc(p.image)}" onerror="this.style.display='none'" style="width:40px;height:40px;border-radius:var(--r);object-fit:cover;flex-shrink:0;background:var(--bs);border:0.5px solid var(--br);"/>
+      <div class="rcard-i"><div class="rcard-n">${esc(p.name)}</div><div class="rcard-m">${esc(p.brand)}${p.category?' · '+esc(p.category):''}</div></div>
+      <div class="radio"></div>
+    </div>`;
+  });
+  h+=`</div><button class="ubtn" id="ubtn" disabled onclick="useR()">Use selected result</button>`;
+  document.getElementById('pbody').innerHTML=h;
+}
+
+function pickR(i){document.querySelectorAll('.rcard').forEach(c=>c.classList.remove('sel'));document.getElementById('rc'+i).classList.add('sel');selProd=_prods[i];document.getElementById('ubtn').disabled=false;}
+function useR(){if(selProd)showPF(selProd);}
+
+function showPF(prod){
+  selProd=prod;fStates={};selThemes=new Set(prod.themes);
+  const fields=[
+    {key:'category',label:'Category',val:prod.category,conf:'high'},
+    {key:'madeby',label:'Made by',val:prod.madeby,conf:'high'},
+    {key:'soldby',label:'Sold by',val:prod.soldby,conf:prod.soldby?'med':'high'},
+  ].filter(f=>f.val);
+  fields.forEach(f=>{fStates[f.key]='pending';});
+
+  let h=`<div class="pd-hd">
+    <img class="pd-img" src="${esc(prod.image)}" onerror="this.style.display='none'"/>
+    <div style="flex:1;min-width:0;">
+      <div class="pd-title">${esc(prod.name)}</div>
+      <div class="pd-brand">${esc(prod.brand)}</div>
+      ${prod.barcode?`<div class="pd-bc">Barcode: ${esc(prod.barcode)}</div>`:''}
+      ${prod.nutriscore?`<div style="margin-top:5px;"><span style="font-size:11px;background:var(--bs);padding:2px 8px;border-radius:10px;color:var(--ts);border:0.5px solid var(--br);">Nutri-Score ${esc(prod.nutriscore.toUpperCase())}</span></div>`:''}
+    </div>
+  </div>`;
+
+  if(fields.length){
+    h+=`<div class="sec-l">Review and edit each field — accept to add to row</div><div class="fg">`;
+    fields.forEach(f=>{
+      h+=`<div class="ef" id="ef-${f.key}">
+        <div class="ef-t"><span class="ef-col">${f.label}</span><span class="ef-cf ${f.conf==='high'?'ch':'cm'}">${f.conf==='high'?'high match':'review'}</span></div>
+        <input class="ef-inp" id="efi-${f.key}" value="${esc(f.val)}" placeholder="${f.label}..."/>
+        <div class="ef-btns" id="efb-${f.key}"><button class="efa" onclick="accF('${f.key}')">Accept</button><button class="efs" onclick="skpF('${f.key}')">Skip</button></div>
+      </div>`;
+    });
+    h+=`</div>`;
+  }
+
+  if(prod.ingredients){
+    const long=prod.ingredients.length>240;
+    h+=`<div class="ing"><div class="ing-l">Ingredients (preview)</div>
+      <div class="ing-t" id="ing-t">${esc(long?prod.ingredients.substring(0,240)+'...':prod.ingredients)}</div>
+      ${long?`<button class="ing-more" id="ingbtn" onclick="expandIng()">Show all</button>`:''}
+    </div>`;
+    if(long)window._fullIng=prod.ingredients;
+  }
+
+  if(prod.themes.length){
+    h+=`<div class="divl"></div><div class="sec-l">Suggested themes from product labels — toggle to include</div><div class="tr-row">`;
+    prod.themes.forEach(t=>{
+      const k='tc'+t.replace(/[^a-z0-9]/gi,'');
+      h+=`<button class="tc on" id="${k}" onclick="togT('${esc(t)}')"><span class="tdot"></span>${esc(t)}</button>`;
+    });
+    h+=`</div>`;
+  }
+
+  h+=`<div class="src-n">Data from Open Food Facts${prod.barcode?' · barcode '+esc(prod.barcode):''}. Edit any field above before applying. Published datums appear under your author account.</div>`;
+  h+=`<div class="act"><button class="bbk" onclick="resetPB()">← Back</button><button class="bap" onclick="applyRow()">Apply to row</button></div>`;
+  document.getElementById('pbody').innerHTML=h;
+}
+
+function expandIng(){const el=document.getElementById('ing-t');const btn=document.getElementById('ingbtn');if(el&&window._fullIng)el.textContent=window._fullIng;if(btn)btn.style.display='none';}
+function accF(k){fStates[k]='accepted';const el=document.getElementById('ef-'+k);if(el)el.classList.add('acc');const b=document.getElementById('efb-'+k);if(b)b.innerHTML=`<span class="ef-done">Accepted</span>`;}
+function skpF(k){fStates[k]='skipped';const el=document.getElementById('ef-'+k);if(el)el.classList.add('skp');const b=document.getElementById('efb-'+k);if(b)b.innerHTML=`<span class="ef-sk">Skipped</span>`;}
+function togT(t){const k='tc'+t.replace(/[^a-z0-9]/gi,'');const el=document.getElementById(k);if(!el)return;if(selThemes.has(t)){selThemes.delete(t);el.classList.remove('on');}else{selThemes.add(t);el.classList.add('on');}}
+
+function applyRow(){
+  if(!activeRow||!selProd)return;
+  const row=rows.find(r=>r.id===activeRow);if(!row)return;
+  ['category','madeby','soldby'].forEach(k=>{
+    if(fStates[k]==='skipped')return;
+    const inp=document.getElementById('efi-'+k);
+    if(inp&&inp.value.trim())row.filled[k]=inp.value.trim();
+  });
+  if(selThemes.size>0)row.filled.themes=[...selThemes];
+  if(selProd.image)row.img=selProd.image;
+  if(selProd.ingredients)row.filled.ingredients=selProd.ingredients;
+  const panelEl=document.getElementById('panel');
+  renderWS(); panelEl.style.display='block';
+  document.getElementById('pbody').innerHTML=`
+    <div class="succ">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      <div><strong>Row updated.</strong> Click any cell to edit further.<br/><span style="font-size:11px;opacity:.75;">When ready, click Publish all to create the datums under your author account.</span></div>
+    </div>
+    <button class="bbk" onclick="resetPB()" style="margin-top:2px;">Look up another product</button>`;
+}
+
+function showNF(q){document.getElementById('pbody').innerHTML=`<div class="nf"><div class="nf-t">No results for "${esc(q)}"</div><div class="nf-s">This product may not be in Open Food Facts yet.<br/>Fill the row manually by clicking any cell above.</div></div>`;}
+
+renderWS();
+</script>
+</body>
+</html>
