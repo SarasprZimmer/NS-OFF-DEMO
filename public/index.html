@@ -163,7 +163,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bt);color:var(--tp);font-
 
   <div class="proxy-note">
     API calls use this app's Express routes (<code>/api/off/*</code>), which proxy Open Food Facts on the server (no browser CORS issues).
-    See the dev spec below for route details.
   </div>
 
   <div class="ws-card">
@@ -204,72 +203,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bt);color:var(--tp);font-
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         Search by name or barcode.<br/>You review every field before it goes into your row.
       </div>
-    </div>
-  </div>
-
-  <!-- DEV SPEC -->
-  <div style="margin-top:2rem;background:var(--bp);border:0.5px solid var(--br);border-radius:var(--rl);overflow:hidden;">
-    <div style="padding:12px 16px;border-bottom:0.5px solid var(--br);background:var(--bs);">
-      <div style="font-size:13px;font-weight:500;">Dev handoff — Express proxy routes</div>
-      <div style="font-size:11px;color:var(--tt);margin-top:2px;">Add these two routes to the North Star Express server. No new dependencies needed — Node has fetch built in (v18+).</div>
-    </div>
-    <div style="padding:14px 16px;">
-      <div style="font-size:11px;color:var(--tt);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;">routes/off.js</div>
-      <pre style="font-size:12px;font-family:monospace;background:var(--bs);padding:14px;border-radius:var(--r);color:var(--tp);white-space:pre-wrap;line-height:1.7;border:0.5px solid var(--br);">const express = require('express');
-const router = express.Router();
-
-const OFF_FIELDS = [
-  'code','product_name','brands','categories_tags',
-  'labels_tags','image_front_url','ingredients_text',
-  'stores_tags','nutrition_grades'
-].join(',');
-
-// GET /api/off/search?q=cheerios
-router.get('/search', async (req, res) => {
-  const { q } = req.query;
-  if (!q) return res.status(400).json({ error: 'q is required' });
-  try {
-    const url = `https://search.openfoodfacts.org/search?` +
-      `q=${encodeURIComponent(q)}&langs=en&page_size=6&fields=${encodeURIComponent(OFF_FIELDS)}`;
-    const r = await fetch(url, {
-      headers: { 'User-Agent': 'NorthStar/1.0 (northstarproject.org)' }
-    });
-    const data = await r.json();
-    res.json(data);
-  } catch (e) {
-    res.status(500).json({ error: e.message });
-  }
-});
-
-// GET /api/off/barcode/:code
-router.get('/barcode/:code', async (req, res) => {
-  const { code } = req.params;
-  try {
-    const url = `https://world.openfoodfacts.net/api/v2/product/${code}.json` +
-      `?fields=${encodeURIComponent(OFF_FIELDS)}`;
-    const r = await fetch(url, {
-      headers: {
-        'Authorization': 'Basic ' + Buffer.from('off:off').toString('base64'),
-        'User-Agent': 'NorthStar/1.0 (northstarproject.org)'
-      }
-    });
-    const data = await r.json();
-    res.json(data);
-  } catch (e) {
-    res.status(500).json({ error: e.message });
-  }
-});
-
-module.exports = router;</pre>
-      <div style="font-size:11px;color:var(--tt);text-transform:uppercase;letter-spacing:.07em;margin:14px 0 8px;">Mount in app.js or server.js</div>
-      <pre style="font-size:12px;font-family:monospace;background:var(--bs);padding:12px;border-radius:var(--r);color:var(--tp);white-space:pre-wrap;line-height:1.7;border:0.5px solid var(--br);">const offRouter = require('./routes/off');
-app.use('/api/off', offRouter);</pre>
-      <div style="font-size:11px;color:var(--tt);text-transform:uppercase;letter-spacing:.07em;margin:14px 0 8px;">React component fetch calls (replaces direct OFF calls)</div>
-      <pre style="font-size:12px;font-family:monospace;background:var(--bs);padding:12px;border-radius:var(--r);color:var(--tp);white-space:pre-wrap;line-height:1.7;border:0.5px solid var(--br);">// Name search
-const res = await fetch(`/api/off/search?q=${encodeURIComponent(query)}`);
-
-// Barcode lookup
-const res = await fetch(`/api/off/barcode/${barcode}`);</pre>
     </div>
   </div>
 
@@ -442,7 +375,7 @@ async function doSearch(){
     else{showResults(hits.slice(0,5).map(normProd));}
   }catch(e){
     console.error(e);
-    document.getElementById('pbody').innerHTML=`<div class="errmsg"><strong>Search failed.</strong><br/>${esc(e.message)}<br/><br/>The demo proxy may be temporarily unavailable. The Express routes in the dev spec below eliminate this dependency entirely.</div>`;
+    document.getElementById('pbody').innerHTML=`<div class="errmsg"><strong>Search failed.</strong><br/>${esc(e.message)}<br/><br/>Check that the server is running and try again.</div>`;
   }
 }
 
